@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-serif: "Fraunces", Georgia, serif;
+    --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-cream text-ink font-sans;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  ::selection {
+    @apply bg-gold/30 text-ink;
+  }
+
+  h1, h2, h3, h4, h5 {
+    @apply font-serif tracking-tightish;
+    font-feature-settings: "ss01";
+  }
+}
+
+@layer components {
+  .container-x {
+    @apply mx-auto w-full max-w-[1280px] px-6 sm:px-8 lg:px-12;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium tracking-wide transition-all duration-300 ease-out-soft;
+  }
+
+  .btn-primary {
+    @apply btn bg-ink text-cream hover:bg-jungle hover:shadow-lg hover:shadow-jungle/20;
+  }
+
+  .btn-gold {
+    @apply btn bg-gold text-white hover:bg-gold-600 hover:shadow-lg hover:shadow-gold/30;
+  }
+
+  .btn-outline {
+    @apply btn border border-ink/20 bg-transparent text-ink hover:border-ink hover:bg-ink hover:text-cream;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-ink hover:bg-ink/5;
+  }
+
+  .field {
+    @apply w-full rounded-xl border border-ink/15 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink-muted/60 transition-all duration-200
+           focus:border-gold focus:outline-none focus:ring-4 focus:ring-gold/15;
+  }
+
+  .label {
+    @apply block text-xs font-medium uppercase tracking-[0.14em] text-ink-muted mb-2;
+  }
+
+  .card-soft {
+    @apply rounded-2xl border border-ink/5 bg-white shadow-[0_1px_2px_rgba(24,24,27,0.04),0_8px_30px_rgba(24,24,27,0.04)];
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.22em] text-gold-600;
+  }
+
+  .display-1 {
+    @apply font-serif text-[clamp(2.75rem,7vw,6.5rem)] leading-[0.95] tracking-tighter;
+    font-weight: 400;
+  }
+
+  .display-2 {
+    @apply font-serif text-[clamp(2rem,4.6vw,4rem)] leading-[1.02] tracking-tighter;
+    font-weight: 400;
+  }
+
+  .display-3 {
+    @apply font-serif text-[clamp(1.6rem,2.8vw,2.5rem)] leading-[1.1] tracking-tightish;
+    font-weight: 400;
+  }
+}
+
+/* Smooth section reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 1s cubic-bezier(0.22, 1, 0.36, 1), transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Marquee */
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Image hover */
+.img-zoom {
+  transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.group:hover .img-zoom {
+  transform: scale(1.06);
+}

@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("admin")
+  createdAt DateTime @default(now())
+}
+
+model Room {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  price       Float
+  description String    @db.Text
+  shortDesc   String    @db.VarChar(255)
+  capacity    Int       @default(2)
+  beds        Int       @default(1)
+  size        Int       @default(28) // m²
+  images      String    @db.Text // JSON array
+  amenities   String    @db.Text // JSON array
+  available   Boolean   @default(true)
+  featured    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  bookings    Booking[]
+}
+
+model Booking {
+  id            String   @id @default(cuid())
+  reference     String   @unique
+  roomId        String
+  room          Room     @relation(fields: [roomId], references: [id])
+  customerName  String
+  email         String
+  phone         String
+  guests        Int      @default(1)
+  checkIn       DateTime
+  checkOut      DateTime
+  nights        Int
+  totalPrice    Float
+  status        String   @default("BOOKED") // BOOKED | CHECKED_IN | CHECKED_OUT | CANCELLED
+  notes         String?  @db.Text
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([roomId])
+  @@index([checkIn, checkOut])
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String   @db.Text
+  createdAt DateTime @default(now())
+}

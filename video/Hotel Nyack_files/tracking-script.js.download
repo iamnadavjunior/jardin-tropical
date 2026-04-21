@@ -1,0 +1,243 @@
+// Helper function to check if the referrer is from journey.com (including subdomains)
+function isFromExcludedDomain(url) {
+  var pattern = /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:.*\.)?(journey\.com)/;
+  return pattern.test(url);
+}
+
+// Helper function to get a URL parameter by name
+function getUrlParameter(name) {
+  var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
+  var results = regex.exec(window.location.href);
+  if (!results) return null;
+  if (!results[2]) return "";
+  return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+// Helper function to check if the URL contains specific query parameters
+function hasRelevantQueryParams(url) {
+  var queryParams = ["gclid", "fbclid", "msclkid", "ttclid"];
+  var hasUtm = /utm_[^=]+=[^&]+/.test(url);
+  return (
+    queryParams.some(function (param) {
+      return url.includes(param + "=");
+    }) || hasUtm
+  );
+}
+
+// Helper function to set a cookie
+function setCookie(name, value, minutes) {
+  var date = new Date();
+  date.setTime(date.getTime() + minutes * 60 * 1000);
+  var expires = "expires=" + date.toUTCString();
+  value = encodeURIComponent(value);
+
+  // Determine if we're on localhost
+  const isLocalhost = window.location.hostname === "localhost";
+
+  // Set cookie with or without domain based on environment
+  if (isLocalhost) {
+    document.cookie = name + "=" + value + ";" + expires + ";path=/";
+  } else {
+    document.cookie = name + "=" + value + ";" + expires + ";path=/;domain=journey.com";
+  }
+}
+
+// Helper function to get a cookie by name
+function getCookie(name) {
+  var value = "; " + document.cookie;
+  var parts = value.split("; " + name + "=");
+  if (parts.length === 2) return decodeURIComponent(parts.pop().split(";").shift());
+}
+
+// Helper function to delete a cookie by name
+function deleteCookie(name) {
+  const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+
+  if (isLocalhost) {
+    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+  } else {
+    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;domain=journey.com";
+  }
+}
+
+// UUID v4 generation function
+function uuidv4() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+try {
+  var currentUrl = window.location.href;
+  var currentReferrer = document.referrer;
+  var shouldUpdateUrls = hasRelevantQueryParams(currentUrl);
+  var cookiesUpdated = false;
+
+  // Reset all relevant cookies if htjs_anonymous_id is missing
+  if (!getCookie("htjs_anonymous_id")) {
+    // Delete existing cookies
+    [
+      "jrny_ext_ref_first",
+      "jrny_ext_ref_last",
+      "jrny_url_first",
+      "jrny_url_last",
+      "gclid",
+      "fbclid",
+      "msclkid",
+      "ttclid",
+      "jrny_session_count",
+    ].forEach(function (cookieName) {
+      deleteCookie(cookieName);
+    });
+
+    // Set a new htjs_anonymous_id cookie
+    var anonymousId = uuidv4();
+    setCookie("htjs_anonymous_id", anonymousId, 365 * 24 * 60); // 1 year in minutes
+    cookiesUpdated = true;
+  }
+
+  // Check if the referrer is not from journey.com (including subdomains)
+  if (!isFromExcludedDomain(currentReferrer)) {
+    if (!getCookie("jrny_ext_ref_first")) {
+      setCookie("jrny_ext_ref_first", currentReferrer, 365 * 24 * 60); // 1 year
+      cookiesUpdated = true;
+    }
+
+    if (currentReferrer && getCookie("jrny_ext_ref_last") !== currentReferrer) {
+      setCookie("jrny_ext_ref_last", currentReferrer, 365 * 24 * 60); // 1 year
+      cookiesUpdated = true;
+    }
+  }
+
+  if (shouldUpdateUrls) {
+    if (!getCookie("jrny_url_first")) {
+      setCookie("jrny_url_first", currentUrl, 365 * 24 * 60); // 1 year
+      cookiesUpdated = true;
+    }
+
+    if (getCookie("jrny_url_last") !== currentUrl) {
+      setCookie("jrny_url_last", currentUrl, 365 * 24 * 60); // 1 year
+      cookiesUpdated = true;
+
+      ["gclid", "fbclid", "msclkid", "ttclid"].forEach(function (param) {
+        var value = getUrlParameter(param);
+        if (value) {
+          setCookie("jrny_" + param, value, 365 * 24 * 60); // 1 year
+        }
+      });
+    }
+  }
+
+  // Handle jrny_session_id and jrny_session_count cookies
+  var sessionId = getCookie("jrny_session_id");
+  if (!sessionId) {
+    sessionId = uuidv4(); // Generate a new session ID if missing
+    setCookie("jrny_session_id", sessionId, 30); // Set 30-minute expiration
+
+    // Increment or initialize jrny_session_count
+    var sessionCount = parseInt(getCookie("jrny_session_count") || "0", 10);
+    sessionCount++;
+    setCookie("jrny_session_count", sessionCount, 365 * 24 * 60); // Store for 1 year
+    cookiesUpdated = true;
+  } else {
+    // Refresh jrny_session_id expiration
+    setCookie("jrny_session_id", sessionId, 30); // Refresh 30-minute expiration
+  }
+
+  // Push data to topSoil if cookies were updated
+  if (cookiesUpdated) {
+    var topSoilObj = {
+      event: "Attribution Details Updated",
+      jrny_ext_ref_first: getCookie("jrny_ext_ref_first"),
+      jrny_ext_ref_last: getCookie("jrny_ext_ref_last"),
+      jrny_url_first: getCookie("jrny_url_first"),
+      jrny_url_last: getCookie("jrny_url_last"),
+      htjs_anonymous_id: getCookie("htjs_anonymous_id"),
+      jrny_session_id: getCookie("jrny_session_id"),
+      jrny_session_count: getCookie("jrny_session_count"), // Include session count
+      jrny_attr_updated: true,
+    };
+
+    ["gclid", "fbclid", "msclkid", "ttclid"].forEach(function (param) {
+      var value = getUrlParameter(param);
+      if (value) {
+        topSoilObj["jrny_" + param] = value;
+      }
+    });
+
+    window.topSoil = window.topSoil || [];
+    window.topSoil.push(topSoilObj);
+  }
+} catch (error) {
+  console.error("Error in custom attribution script:", error);
+}
+
+// Start Google Tag Manager Code
+!(function () {
+  "use strict";
+  function l(e) {
+    for (var t = e, r = 0, n = document.cookie.split(";"); r < n.length; r++) {
+      var o = n[r].split("=");
+      if (o[0].trim() === t) return o[1];
+    }
+  }
+  function s(e) {
+    return localStorage.getItem(e);
+  }
+  function u(e) {
+    return window[e];
+  }
+  function A(e, t) {
+    e = document.querySelector(e);
+    return t ? (null == e ? void 0 : e.getAttribute(t)) : null == e ? void 0 : e.textContent;
+  }
+  var e = window,
+    t = document,
+    r = "script",
+    n = "topSoil",
+    o = "https://rain.journey.com",
+    a = "https://load.rain.journey.com",
+    i = "e10aswjotpxcy",
+    c = "1yg=aWQ9R1RNLU1IUk5ENlNYJmw9dG9wU29pbA%3D%3D&sort=desc",
+    g = "cookie",
+    v = "htjs_anonymous_id",
+    E = "",
+    d = !1;
+  try {
+    var d =
+        !!g &&
+        ((m = navigator.userAgent), !!(m = new RegExp("Version/([0-9._]+)(.*Mobile)?.*Safari.*").exec(m))) &&
+        16.4 <= parseFloat(m[1]),
+      f = "stapeUserId" === g,
+      I =
+        d && !f
+          ? (function (e, t, r) {
+              void 0 === t && (t = "");
+              var n = { cookie: l, localStorage: s, jsVariable: u, cssSelector: A },
+                t = Array.isArray(t) ? t : [t];
+              if (e && n[e])
+                for (var o = n[e], a = 0, i = t; a < i.length; a++) {
+                  var c = i[a],
+                    c = r ? o(c, r) : o(c);
+                  if (c) return c;
+                }
+              else console.warn("invalid uid source", e);
+            })(g, v, E)
+          : void 0;
+    d = d && (!!I || f);
+  } catch (e) {
+    console.error(e);
+  }
+  var m = e,
+    g =
+      ((m[n] = m[n] || []),
+      m[n].push({ "gtm.start": new Date().getTime(), event: "gtm.js" }),
+      t.getElementsByTagName(r)[0]),
+    v = I ? "&bi=" + encodeURIComponent(I) : "",
+    E = t.createElement(r),
+    f = (d && (i = 8 < i.length ? i.replace(/([a-z]{8}$)/, "kp$1") : "kp" + i), !d && a ? a : o);
+  (E.async = !0), (E.src = f + "/" + i + ".js?" + c + v), null != (e = g.parentNode) && e.insertBefore(E, g);
+})();
+// End Google Tag Manager Code
