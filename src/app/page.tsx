@@ -14,8 +14,8 @@ export default async function OverviewPage() {
       {/* HERO */}
       <section className="relative h-[100svh] min-h-[640px] w-full overflow-hidden">
         <Image
-          src="/images/highlights/tropical-21.jpg"
-          alt="Lush garden of Apart Jardin Tropical"
+          src="/images/highlights/tropical-18.jpg"
+          alt="Apart Jardin Tropical at night"
           fill
           priority
           sizes="100vw"
@@ -23,17 +23,20 @@ export default async function OverviewPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-ink/40 via-ink/20 to-ink/70" />
 
-        <div className="relative h-full container-x flex flex-col justify-end pb-20 sm:pb-28 text-cream">
-          <Reveal delay={100}>
-            <p className="eyebrow text-gold mb-6">Apart · Hotel · Garden</p>
-          </Reveal>
+        <div className="relative h-full container-x flex flex-col justify-end pb-12 sm:pb-16 text-cream">
           <Reveal delay={200}>
             <h1 className="display-1 max-w-5xl">
-              A garden retreat,<br />slow by design.
+              When night falls,<br />the garden glows.
             </h1>
           </Reveal>
+          <Reveal delay={300}>
+            <p className="mt-6 max-w-xl text-base sm:text-lg text-cream/80 leading-relaxed">
+              Six lantern-lit rooms tucked in a tropical garden — slow mornings,
+              warm evenings, and the quiet luxury of being unhurried.
+            </p>
+          </Reveal>
           <Reveal delay={400}>
-            <div className="mt-10 flex flex-col sm:flex-row gap-4 sm:items-center">
+            <div className="mt-8 flex flex-col sm:flex-row gap-4 sm:items-center">
               <Link href="/booking" className="btn-gold">
                 Reserve your stay <ArrowRight size={16} />
               </Link>
@@ -44,7 +47,7 @@ export default async function OverviewPage() {
           </Reveal>
 
           <Reveal delay={500}>
-            <div className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-3xl border-t border-cream/20 pt-8">
+            <div className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-3xl border-t border-cream/20 pt-6">
               {[
                 { k: "Six", v: "Curated rooms" },
                 { k: "100%", v: "Garden setting" },
