@@ -28,7 +28,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs \
  && adduser  --system --uid 1001 nextjs
 
-# Application files
+# Application files — copy deps from the install stage (includes tsx, prisma, etc.)
 COPY --from=deps    /app/node_modules ./node_modules
 COPY --from=builder /app/.next        ./.next
 COPY --from=builder /app/public       ./public
