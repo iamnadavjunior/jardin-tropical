@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode, type ElementType } from "react";
 import { cn } from "@/lib/utils";
 
 export function Reveal({
   children,
   className,
   delay = 0,
-  as: Tag = "div",
+  as: Tag = "div" as ElementType,
 }: {
   children: ReactNode;
   className?: string;
   delay?: number;
-  as?: keyof JSX.IntrinsicElements;
+  as?: ElementType;
 }) {
   const ref = useRef<HTMLElement | null>(null);
   const [shown, setShown] = useState(false);
@@ -36,11 +36,10 @@ export function Reveal({
   }, []);
 
   return (
-    // @ts-expect-error - dynamic tag
     <Tag
-      ref={ref}
+      ref={ref as never}
       style={{ transitionDelay: `${delay}ms` }}
-      className={cn("reveal", shown && "in", className)}
+      className={cn("reveal", shown && "in", className) as string}
     >
       {children}
     </Tag>
