@@ -1,0 +1,10 @@
+.git
+.gitignore
+node_modules
+.next
+*.md
+.env
+.env.example
+video/
+Highlights/
+ecosystem.config.js
