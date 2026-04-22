@@ -1,82 +1,39 @@
-# Deployment Guide — Aparthotel Jardin Tropical (VPS + FileZilla)
+# Deployment Guide — Aparthotel Jardin Tropical (Hostinger VPS from GitHub)
 
 This project is a Next.js 14 (App Router) app with a Prisma + MySQL backend.
-Below is the simplest reliable deploy flow using **FileZilla** for upload and **PM2** for process management.
+Deploy directly on a **Hostinger VPS** by pulling the repository from GitHub:
+<https://github.com/iamnadavjunior/jardin-tropical>
 
 ---
 
-## 1. Build locally (Windows)
+## 1. Hostinger VPS prerequisites (run once via SSH)
 
-Run in the project root (`c:\wamp64\www\jardin-tropical`):
-
-```powershell
-# 1. Install deps (skip if already done)
-npm install
-
-# 2. Build the standalone bundle
-npm run build
-```
-
-After build you will have:
-
-- `.next/standalone/`      ← self-contained Node server (`server.js` inside)
-- `.next/static/`          ← compiled JS/CSS (must sit next to standalone)
-- `public/`                ← static assets (images, favicon, etc.)
-- `prisma/`                ← schema + seed
-- `package.json`, `package-lock.json`
-- `.env.example`           ← template for production env
-
----
-
-## 2. What to upload via FileZilla
-
-Connect to your VPS (SFTP, port 22) and upload the following to your target directory, e.g. `/var/www/jardin-tropical`:
-
-| Local source                  | Remote destination                                  |
-|-------------------------------|-----------------------------------------------------|
-| `.next/standalone/*`          | `/var/www/jardin-tropical/`                         |
-| `.next/static/`               | `/var/www/jardin-tropical/.next/static/`            |
-| `public/`                     | `/var/www/jardin-tropical/public/`                  |
-| `prisma/`                     | `/var/www/jardin-tropical/prisma/`                  |
-| `package.json`                | `/var/www/jardin-tropical/package.json`             |
-| `package-lock.json`           | `/var/www/jardin-tropical/package-lock.json`        |
-| `ecosystem.config.js`         | `/var/www/jardin-tropical/ecosystem.config.js`      |
-| `.env.example`                | `/var/www/jardin-tropical/.env.example`             |
-
-> **Do NOT upload**: `node_modules/`, `.next/cache/`, `.env` (create it on the server), `.git/`.
-
-> **Note**: `.next/standalone/` already contains a trimmed `node_modules` with only the runtime dependencies, so you do not need to upload your local `node_modules`.
-
-### FileZilla tips
-- Use **Transfer → Transfer type → Binary** to avoid line-ending issues.
-- Right-click the local files → **Upload** to drop them in the current remote directory.
-- If you re-deploy, replace `.next/static/`, the `standalone` files, and `public/` then restart PM2 (see step 5).
-
----
-
-## 3. VPS prerequisites (run once via SSH)
+Order a Hostinger VPS plan with **Ubuntu 22.04** (or use the Hostinger "Node.js" template), then SSH in as `root` (or your sudo user).
 
 ```bash
+# System updates
+apt-get update && apt-get upgrade -y
+
 # Node.js 20 LTS
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt-get install -y nodejs
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+apt-get install -y nodejs git build-essential
 
-# PM2 (process manager) and pnpm/npm (npm is bundled)
-sudo npm install -g pm2
+# PM2 process manager
+npm install -g pm2
 
-# MySQL 8 (or use an existing instance)
-sudo apt-get install -y mysql-server
-sudo mysql_secure_installation
+# MySQL 8 server
+apt-get install -y mysql-server
+mysql_secure_installation
 ```
 
 ### Create the database + user
 
 ```bash
-sudo mysql
+mysql
 ```
 ```sql
 CREATE DATABASE jardin_tropical CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'jardin_user'@'localhost' IDENTIFIED BY 'STRONG_PASSWORD';
+CREATE USER 'jardin_user'@'localhost' IDENTIFIED BY 'STRONG_PASSWORD_HERE';
 GRANT ALL PRIVILEGES ON jardin_tropical.* TO 'jardin_user'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
@@ -84,31 +41,63 @@ EXIT;
 
 ---
 
-## 4. First-time setup on the VPS
+## 2. Clone the project from GitHub
 
 ```bash
-cd /var/www/jardin-tropical
-
-# Create production env from the template
-cp .env.example .env
-nano .env       # fill DATABASE_URL, NEXTAUTH_SECRET, NEXTAUTH_URL, ADMIN_*
-
-# Install only what is needed for prisma + seed (standalone already bundled the rest)
-npm install --omit=dev prisma @prisma/client tsx
-
-# Push schema + seed initial admin/rooms
-npx prisma db push
-npx tsx prisma/seed.ts
+mkdir -p /var/www
+cd /var/www
+git clone https://github.com/iamnadavjunior/jardin-tropical.git
+cd jardin-tropical
 ```
 
-> Generate a strong secret with: `openssl rand -hex 32`
+> If the repo ever becomes private, generate a Personal Access Token on GitHub and use:
+> `git clone https://USERNAME:TOKEN@github.com/iamnadavjunior/jardin-tropical.git`
 
 ---
 
-## 5. Run the app with PM2
+## 3. Configure environment
 
 ```bash
-cd /var/www/jardin-tropical
+cp .env.example .env
+nano .env
+```
+
+Fill in:
+
+```
+DATABASE_URL="mysql://jardin_user:STRONG_PASSWORD_HERE@localhost:3306/jardin_tropical"
+NEXTAUTH_SECRET="$(openssl rand -hex 32)"
+NEXTAUTH_URL="https://yourdomain.com"
+ADMIN_EMAIL="admin@jardintropical.com"
+ADMIN_PASSWORD="your-strong-admin-password"
+NODE_ENV="production"
+PORT=3000
+HOSTNAME="0.0.0.0"
+```
+
+> Generate a fresh secret with: `openssl rand -hex 32`
+
+---
+
+## 4. Install, migrate, build
+
+```bash
+# Install dependencies (postinstall runs prisma generate automatically)
+npm install
+
+# Push schema to MySQL and seed initial admin + rooms
+npx prisma db push
+npx tsx prisma/seed.ts
+
+# Production build
+npm run build
+```
+
+---
+
+## 5. Start with PM2
+
+```bash
 pm2 start ecosystem.config.js
 pm2 save
 pm2 startup        # follow the printed command to enable auto-start on reboot
@@ -128,7 +117,7 @@ pm2 stop jardin-tropical
 ## 6. Nginx reverse proxy + HTTPS
 
 ```bash
-sudo apt-get install -y nginx certbot python3-certbot-nginx
+apt-get install -y nginx certbot python3-certbot-nginx
 ```
 
 Create `/etc/nginx/sites-available/jardin-tropical`:
@@ -154,41 +143,57 @@ server {
 }
 ```
 
-Enable + issue TLS cert:
+Enable + issue TLS certificate:
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/jardin-tropical /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl reload nginx
-sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+ln -s /etc/nginx/sites-available/jardin-tropical /etc/nginx/sites-enabled/
+nginx -t && systemctl reload nginx
+certbot --nginx -d yourdomain.com -d www.yourdomain.com
 ```
 
-Your site will now be available at https://yourdomain.com.
+Point your domain's **A record** to your Hostinger VPS IP first (in Hostinger DNS settings or your registrar).
+
+The site will be live at https://yourdomain.com.
 
 ---
 
 ## 7. Re-deploying after code changes
 
-On Windows:
+Push your changes to GitHub from your local machine:
 
 ```powershell
-npm run build
+git add -A
+git commit -m "your message"
+git push origin main
 ```
-
-Then upload via FileZilla (replace contents):
-
-- `.next/standalone/*`  →  `/var/www/jardin-tropical/`
-- `.next/static/`       →  `/var/www/jardin-tropical/.next/static/`
-- `public/`             →  `/var/www/jardin-tropical/public/`
-- (only if Prisma schema changed) `prisma/`
 
 Then on the VPS:
 
 ```bash
 cd /var/www/jardin-tropical
-# only if schema changed:
-npx prisma db push
-
+git pull origin main
+npm install                 # if dependencies changed
+npx prisma db push          # only if prisma/schema.prisma changed
+npm run build
 pm2 restart jardin-tropical
+```
+
+A one-liner you can save as `deploy.sh` on the server:
+
+```bash
+#!/usr/bin/env bash
+set -e
+cd /var/www/jardin-tropical
+git pull origin main
+npm install
+npx prisma generate
+npm run build
+pm2 restart jardin-tropical
+```
+
+```bash
+chmod +x deploy.sh
+./deploy.sh
 ```
 
 ---
@@ -196,7 +201,7 @@ pm2 restart jardin-tropical
 ## 8. After first login
 
 Sign in at `https://yourdomain.com/admin/login` with the credentials in your `.env`,
-then immediately change the admin password from the admin panel (or by re-seeding with new env values).
+then change the admin password from the admin panel.
 
 ---
 
@@ -205,7 +210,8 @@ then immediately change the admin password from the admin panel (or by re-seedin
 | Symptom | Fix |
 |---|---|
 | 502 Bad Gateway | `pm2 logs jardin-tropical` — usually a missing env var or DB unreachable |
-| Images don't load | Make sure `public/` is uploaded next to `server.js` |
-| `Prisma Client not generated` | Ensure `prisma/schema.prisma` is uploaded and run `npx prisma generate` |
-| Wrong hostname / mixed content | Set `NEXTAUTH_URL=https://yourdomain.com` and restart PM2 |
-| Port already in use | Change `PORT` in `ecosystem.config.js` and reload Nginx upstream |
+| Images don't load | Ensure `public/` exists in the project root on the server |
+| `Prisma Client not generated` | `npx prisma generate` then `pm2 restart jardin-tropical` |
+| Wrong hostname / mixed content | Set `NEXTAUTH_URL=https://yourdomain.com` and `pm2 restart jardin-tropical` |
+| Port already in use | Change `PORT` in `ecosystem.config.js` and update Nginx upstream |
+| `git pull` rejects | Stash or commit local changes on the server: `git stash && git pull && git stash pop` |
