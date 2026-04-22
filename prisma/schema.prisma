@@ -48,13 +48,34 @@ model Booking {
   checkOut      DateTime
   nights        Int
   totalPrice    Float
-  status        String   @default("BOOKED") // BOOKED | CHECKED_IN | CHECKED_OUT | CANCELLED
+  status        String   @default("BOOKED") // BOOKED | CONFIRMED | CHECKED_IN | CHECKED_OUT | CANCELLED | NO_SHOW
   notes         String?  @db.Text
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  transactions  Transaction[]
 
   @@index([roomId])
   @@index([checkIn, checkOut])
+  @@index([status])
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  type        String   // INCOME | EXPENSE | REFUND | DEPOSIT | WITHDRAWAL
+  category    String   // ROOM_REVENUE | DEPOSIT | REFUND | UTILITIES | PAYROLL | MAINTENANCE | SUPPLIES | MARKETING | OTHER
+  amount      Float    // always positive; sign derived from type
+  currency    String   @default("USD")
+  description String   @db.Text
+  occurredAt  DateTime @default(now())
+  bookingId   String?
+  booking     Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  createdBy   String?  // admin email/name
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([type])
+  @@index([occurredAt])
+  @@index([bookingId])
 }
 
 model ContactMessage {

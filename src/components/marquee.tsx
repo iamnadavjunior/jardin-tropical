@@ -1,5 +1,5 @@
 export function Marquee() {
-  const items = ["Stay with us", "Apart Jardin Tropical", "Six rooms, one garden", "Reserve your retreat"];
+  const items = ["Stay with us", "Aparthotel Jardin Tropical", "Six rooms, one garden", "Reserve your retreat"];
   return (
     <div className="overflow-hidden border-y border-cream/10 py-8 bg-ink">
       <div className="marquee">

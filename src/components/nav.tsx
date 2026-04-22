@@ -3,20 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const links = [
-  { href: "/", label: "Overview" },
-  { href: "/rooms", label: "Rooms" },
-  { href: "/amenities", label: "Amenities" },
-  { href: "/contact", label: "Contact" },
-];
+import { useLang, useT } from "@/lib/i18n";
 
 export function Nav() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { lang, toggle } = useLang();
+  const t = useT();
+
+  const links = [
+    { href: "/", label: t("Home", "Accueil") },
+    { href: "/rooms", label: t("Rooms", "Chambres") },
+    { href: "/amenities", label: t("Amenities", "Services") },
+    { href: "/contact", label: t("Contact", "Contact") },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -49,7 +52,7 @@ export function Nav() {
             transparent ? "text-cream" : "text-ink"
           )}
         >
-          <span className="hidden sm:inline">Apart Jardin Tropical</span>
+          <span className="hidden sm:inline">Aparthotel Jardin Tropical</span>
           <span className="sm:hidden">Jardin Tropical</span>
         </Link>
 
@@ -83,6 +86,19 @@ export function Nav() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <button
+            onClick={toggle}
+            aria-label={t("Switch language", "Changer de langue")}
+            className={cn(
+              "hidden sm:inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-xs tracking-[0.18em] uppercase transition-colors ring-1",
+              transparent
+                ? "text-cream/90 ring-cream/30 hover:bg-cream/10"
+                : "text-ink ring-ink/15 hover:bg-ink/5"
+            )}
+          >
+            <Globe size={13} strokeWidth={1.6} />
+            {lang === "en" ? "FR" : "EN"}
+          </button>
           <Link
             href="/booking"
             className={cn(
@@ -92,7 +108,7 @@ export function Nav() {
                 : "bg-ink text-cream hover:bg-jungle"
             )}
           >
-            Book a stay
+            {t("Book a stay", "Réserver")}
           </Link>
           <button
             onClick={() => setOpen((v) => !v)}
@@ -121,6 +137,16 @@ export function Nav() {
                 {l.label}
               </Link>
             ))}
+            <button
+              onClick={() => {
+                toggle();
+                setOpen(false);
+              }}
+              className="mt-4 inline-flex items-center gap-2 self-start rounded-full px-4 py-2 text-xs tracking-[0.18em] uppercase ring-1 ring-ink/15 text-ink"
+            >
+              <Globe size={13} strokeWidth={1.6} />
+              {lang === "en" ? "Français" : "English"}
+            </button>
           </nav>
         </div>
       )}

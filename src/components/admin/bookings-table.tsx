@@ -15,19 +15,28 @@ type Booking = {
   checkOut: string;
   nights: number;
   totalPrice: number;
-  status: "BOOKED" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELLED";
+  status: "BOOKED" | "CONFIRMED" | "CHECKED_IN" | "CHECKED_OUT" | "CANCELLED" | "NO_SHOW";
   notes: string | null;
   createdAt: string;
   room: { id: string; name: string; slug: string };
 };
 
-const STATUSES = ["BOOKED", "CHECKED_IN", "CHECKED_OUT", "CANCELLED"] as const;
+const STATUSES = [
+  "BOOKED",
+  "CONFIRMED",
+  "CHECKED_IN",
+  "CHECKED_OUT",
+  "CANCELLED",
+  "NO_SHOW",
+] as const;
 
 const statusStyle: Record<string, string> = {
   BOOKED: "bg-blue-50 text-blue-700 ring-blue-200",
+  CONFIRMED: "bg-amber-50 text-amber-700 ring-amber-200",
   CHECKED_IN: "bg-emerald-50 text-emerald-700 ring-emerald-200",
   CHECKED_OUT: "bg-ink/5 text-ink-muted ring-ink/10",
   CANCELLED: "bg-red-50 text-red-700 ring-red-200",
+  NO_SHOW: "bg-orange-50 text-orange-700 ring-orange-200",
 };
 
 export function BookingsTable({

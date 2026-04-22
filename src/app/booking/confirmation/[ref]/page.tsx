@@ -48,7 +48,7 @@ export default async function ConfirmationPage({ params }: { params: { ref: stri
             <div className="p-8 space-y-2">
               <p className="eyebrow">Room</p>
               <h2 className="font-serif text-3xl text-ink">{booking.room?.name}</h2>
-              <p className="text-sm text-ink-muted">at Apart Jardin Tropical</p>
+              <p className="text-sm text-ink-muted">at Aparthotel Jardin Tropical</p>
             </div>
           </div>
 

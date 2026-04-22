@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { diffNights, generateRef } from "@/lib/utils";
+import { recordBookingEvent } from "@/lib/finance";
 
 const schema = z.object({
   roomSlug: z.string().min(1),
@@ -74,6 +75,9 @@ export async function POST(req: Request) {
         notes: data.notes ?? null,
       },
     });
+
+    // Record initial reservation deposit (auto-tracked in finance dashboard)
+    await recordBookingEvent(booking.id, "BOOKED");
 
     // TODO: send confirmation email here (e.g. with Resend)
 

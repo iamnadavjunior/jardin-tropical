@@ -45,10 +45,10 @@ export default function ContactPage() {
           <Reveal className="lg:col-span-5">
             <div className="space-y-10">
               {[
-                { Icon: Mail, label: "Email", value: "hello@jardintropical.com", href: "mailto:hello@jardintropical.com" },
-                { Icon: Phone, label: "Phone", value: "+1 (234) 567-890", href: "tel:+1234567890" },
-                { Icon: MessageCircle, label: "WhatsApp", value: "Chat with us instantly", href: "https://wa.me/1234567890" },
-                { Icon: MapPin, label: "Visit", value: "Jardin Tropical, Tropical Avenue", href: "#location" },
+                { Icon: Mail, label: "Email", value: "info@jtropical.com", href: "mailto:info@jtropical.com" },
+                { Icon: Phone, label: "Phone", value: "+257 76 718 975", href: "tel:+25776718975" },
+                { Icon: MessageCircle, label: "WhatsApp", value: "Chat with us instantly", href: "https://wa.me/25776718975" },
+                { Icon: MapPin, label: "Visit", value: "12 avenue Buyongwe, Mutanga Sud, Bujumbura, BURUNDI", href: "#location" },
               ].map(({ Icon, label, value, href }) => (
                 <a key={label} href={href} className="flex items-start gap-5 group">
                   <span className="grid place-items-center w-12 h-12 rounded-full bg-cream-200 text-gold-600 group-hover:bg-gold group-hover:text-white transition-colors">
@@ -120,7 +120,7 @@ export default function ContactPage() {
               <iframe
                 title="Map"
                 className="absolute inset-0 w-full h-full"
-                src="https://www.openstreetmap.org/export/embed.html?bbox=-1.6%2C12.3%2C-1.5%2C12.4&layer=mapnik"
+                src="https://maps.google.com/maps?q=12+avenue+Buyongwe,+Mutanga+Sud,+Bujumbura,+Burundi&output=embed"
                 loading="lazy"
               />
             </div>

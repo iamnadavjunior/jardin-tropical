@@ -77,13 +77,21 @@ export function RoomCard({ room }: { room: RoomDTO }) {
             <span className="w-1 h-1 rounded-full bg-gold" /> Featured
           </span>
         )}
+        {room.occupiedTonight && (
+          <span className="absolute top-4 right-4 inline-flex items-center gap-1.5 rounded-full bg-ink/85 backdrop-blur px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.18em] text-cream">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+            Booked tonight
+          </span>
+        )}
       </div>
 
       {/* Info */}
       <div className="flex flex-col justify-between gap-8">
         <div>
           <p className="eyebrow">Room</p>
-          <h3 className="display-3 mt-3 text-ink">{room.name}</h3>
+          <Link href={`/rooms/${room.slug}`} className="inline-block group/title">
+            <h3 className="display-3 mt-3 text-ink group-hover/title:text-gold-600 transition-colors">{room.name}</h3>
+          </Link>
 
           <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-muted">
             <span className="inline-flex items-center gap-2"><Users size={14} /> Up to {room.capacity} guests</span>

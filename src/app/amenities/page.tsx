@@ -1,12 +1,13 @@
 import Image from "next/image";
 import {
-  Wifi, Coffee, Wind, Sparkles, Waves, ConciergeBell, Car, UtensilsCrossed,
-  ShowerHead, ShieldCheck, Tv, Trees, Zap, Globe2,
+  Wifi, Coffee, Wind, Sparkles, ConciergeBell, Car, UtensilsCrossed,
+  ShowerHead, ShieldCheck, Tv, Trees, Zap, Globe2, ChefHat, Shirt,
+  Monitor, BedDouble, Droplets, Thermometer,
 } from "lucide-react";
 import { Reveal } from "@/components/reveal";
 
 export const metadata = {
-  title: "Amenities — Apart Jardin Tropical",
+  title: "Amenities — Aparthotel Jardin Tropical",
   description: "Thoughtful amenities and services to make your stay effortless.",
 };
 
@@ -16,21 +17,27 @@ const groups = [
     items: [
       { Icon: Wind, label: "Air conditioning" },
       { Icon: Wifi, label: "Starlink Wi-Fi" },
-      { Icon: ShowerHead, label: "Rainfall shower" },
-      { Icon: Tv, label: "Smart TV" },
-      { Icon: Coffee, label: "Coffee & tea" },
+      { Icon: Tv, label: "Cable TV" },
       { Icon: ShieldCheck, label: "In-room safe" },
+      { Icon: Coffee, label: "Minibar" },
+      { Icon: ChefHat, label: "Fully equipped kitchen" },
+      { Icon: Monitor, label: "Office area" },
+      { Icon: ShowerHead, label: "Bathroom" },
+      { Icon: BedDouble, label: "Bed linens" },
+      { Icon: Droplets, label: "Toiletries & towels" },
+      { Icon: Thermometer, label: "Hair dryer" },
+      { Icon: Trees, label: "Terrace with garden view" },
     ],
   },
   {
     title: "On the property",
     items: [
-      { Icon: Waves, label: "Outdoor pool" },
       { Icon: Trees, label: "Tropical garden" },
       { Icon: UtensilsCrossed, label: "Breakfast service" },
       { Icon: ConciergeBell, label: "24h concierge" },
       { Icon: Car, label: "Free parking" },
       { Icon: Sparkles, label: "Daily housekeeping" },
+      { Icon: Shirt, label: "Laundry service" },
     ],
   },
 ];
@@ -44,8 +51,10 @@ export default function AmenitiesPage() {
             <p className="eyebrow">Your stay</p>
             <h1 className="display-1 mt-6 text-ink max-w-4xl">Amenities & services.</h1>
             <p className="mt-8 max-w-xl text-lg text-ink-muted leading-relaxed">
-              Quiet attention to detail, in every corner. Everything you need —
-              nothing you don't.
+              All accommodations feature a fully equipped kitchen, terrace, office area, bathroom, and air conditioning. Laundry service is included.
+            </p>
+            <p className="mt-4 max-w-xl text-lg text-ink-muted leading-relaxed">
+              Included: Internet, cable TV, minibar, safe, bed linens, toiletries, towels, hair dryer, and daily housekeeping. The setting is peaceful, and all accommodations have a terrace overlooking a tropical garden with a beautiful view.
             </p>
           </Reveal>
         </div>

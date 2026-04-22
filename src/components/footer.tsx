@@ -3,37 +3,40 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Marquee } from "./marquee";
-
-const cols: Array<{ title: string; links: { href: string; label: string }[] }> = [
-  {
-    title: "Stay",
-    links: [
-      { href: "/rooms", label: "Rooms & Suites" },
-      { href: "/amenities", label: "Amenities" },
-      { href: "/booking", label: "Book a stay" },
-    ],
-  },
-  {
-    title: "Hotel",
-    links: [
-      { href: "/", label: "About us" },
-      { href: "/contact", label: "Contact" },
-      { href: "/contact#location", label: "Location" },
-    ],
-  },
-  {
-    title: "Connect",
-    links: [
-      { href: "mailto:hello@jardintropical.com", label: "hello@jardintropical.com" },
-      { href: "tel:+1234567890", label: "+1 (234) 567-890" },
-      { href: "https://wa.me/1234567890", label: "WhatsApp" },
-    ],
-  },
-];
+import { useT } from "@/lib/i18n";
 
 export function Footer() {
   const pathname = usePathname();
+  const t = useT();
   if (pathname.startsWith("/admin")) return null;
+
+  const cols: Array<{ title: string; links: { href: string; label: string }[] }> = [
+    {
+      title: t("Stay", "Séjour"),
+      links: [
+        { href: "/rooms", label: t("Rooms & Suites", "Chambres & Suites") },
+        { href: "/amenities", label: t("Amenities", "Services") },
+        { href: "/booking", label: t("Book a stay", "Réserver") },
+      ],
+    },
+    {
+      title: t("Hotel", "Hôtel"),
+      links: [
+        { href: "/", label: t("About us", "À propos") },
+        { href: "/contact", label: t("Contact", "Contact") },
+        { href: "/contact#location", label: t("Location", "Emplacement") },
+      ],
+    },
+    {
+      title: t("Connect", "Contact"),
+      links: [
+        { href: "mailto:info@jtropical.com", label: "info@jtropical.com" },
+        { href: "tel:+25776718975", label: "+257 76 718 975" },
+        { href: "https://wa.me/25776718975", label: "WhatsApp" },
+      ],
+    },
+  ];
+
   return (
     <footer className="bg-ink text-cream/80">
       <Marquee />
@@ -42,16 +45,19 @@ export function Footer() {
         <div className="grid gap-14 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
             <Link href="/" className="font-serif text-2xl text-cream tracking-tightish">
-              Apart Jardin Tropical
+              Aparthotel Jardin Tropical
             </Link>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-cream/60">
-              An intimate garden hotel of six rooms — slow mornings, lush surroundings, refined comfort.
+              {t(
+                "An intimate garden hotel of six rooms — slow mornings, lush surroundings, refined comfort.",
+                "Un hôtel-jardin intime de six chambres — matins paisibles, écrin de verdure, confort raffiné."
+              )}
             </p>
             <Link
               href="/booking"
               className="mt-8 inline-flex items-center gap-2 border-b border-gold pb-1 text-sm uppercase tracking-[0.18em] text-gold transition-colors hover:text-cream hover:border-cream"
             >
-              Reserve a stay →
+              {t("Reserve a stay →", "Réserver un séjour →")}
             </Link>
           </div>
 
@@ -74,9 +80,12 @@ export function Footer() {
         </div>
 
         <div className="mt-20 pt-8 border-t border-cream/10 flex flex-col sm:flex-row gap-4 sm:items-center justify-between text-xs text-cream/40">
-          <p>© {new Date().getFullYear()} Apart Jardin Tropical. All rights reserved.</p>
           <p>
-            Designed by{" "}
+            © {new Date().getFullYear()} Aparthotel Jardin Tropical.{" "}
+            {t("All rights reserved.", "Tous droits réservés.")}
+          </p>
+          <p>
+            {t("Designed by", "Conçu par")}{" "}
             <a
               href="https://flexostudio.tech"
               target="_blank"

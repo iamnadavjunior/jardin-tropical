@@ -44,7 +44,7 @@ export default function LoginPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-tr from-ink via-ink/80 to-jungle/60" />
         <div className="relative p-12 flex flex-col justify-between text-cream w-full">
-          <Link href="/" className="font-serif text-xl">Apart Jardin Tropical</Link>
+          <Link href="/" className="font-serif text-xl">Aparthotel Jardin Tropical</Link>
           <div>
             <p className="eyebrow text-gold mb-6">Admin Suite</p>
             <h1 className="display-2">Manage your<br />garden retreat.</h1>
@@ -52,7 +52,20 @@ export default function LoginPage() {
               Bookings, rooms, guests — everything in one calm dashboard.
             </p>
           </div>
-          <p className="text-xs text-cream/40">© {new Date().getFullYear()} Apart Jardin Tropical</p>
+          <div className="text-xs text-cream/40 space-y-1">
+            <p>© {new Date().getFullYear()} Aparthotel Jardin Tropical</p>
+            <p>
+              Designed by{" "}
+              <a
+                href="https://flexostudio.tech"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gold hover:text-cream transition-colors tracking-[0.18em] uppercase"
+              >
+                Flexo Studio
+              </a>
+            </p>
+          </div>
         </div>
       </div>
 
@@ -60,7 +73,7 @@ export default function LoginPage() {
       <div className="flex items-center justify-center p-8">
         <div className="w-full max-w-sm">
           <Link href="/" className="lg:hidden font-serif text-xl text-ink mb-12 block text-center">
-            Apart Jardin Tropical
+            Aparthotel Jardin Tropical
           </Link>
           <p className="eyebrow">Sign in</p>
           <h2 className="display-3 mt-3">Welcome back.</h2>
@@ -106,6 +119,18 @@ export default function LoginPage() {
               Default: admin@jardintropical.com / admin123
             </p>
           </form>
+
+          <p className="mt-12 text-center text-[11px] text-ink-muted/70 lg:hidden">
+            Designed by{" "}
+            <a
+              href="https://flexostudio.tech"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-gold hover:text-ink transition-colors tracking-[0.18em] uppercase"
+            >
+              Flexo Studio
+            </a>
+          </p>
         </div>
       </div>
     </div>

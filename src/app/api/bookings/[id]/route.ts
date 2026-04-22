@@ -2,8 +2,16 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import { recordBookingEvent } from "@/lib/finance";
 
-const STATUSES = ["BOOKED", "CHECKED_IN", "CHECKED_OUT", "CANCELLED"] as const;
+const STATUSES = [
+  "BOOKED",
+  "CONFIRMED",
+  "CHECKED_IN",
+  "CHECKED_OUT",
+  "CANCELLED",
+  "NO_SHOW",
+] as const;
 
 const patchSchema = z.object({
   status: z.enum(STATUSES),
@@ -18,6 +26,12 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
       where: { id: params.id },
       data: { status: data.status },
     });
+
+    // Auto-record finance event when relevant
+    if (data.status === "CONFIRMED" || data.status === "CHECKED_OUT" || data.status === "CANCELLED") {
+      await recordBookingEvent(updated.id, data.status, { createdBy: admin.email });
+    }
+
     return NextResponse.json(updated);
   } catch {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });

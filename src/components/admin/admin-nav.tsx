@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, CalendarCheck, BedDouble, Globe } from "lucide-react";
+import { LayoutDashboard, CalendarCheck, BedDouble, Globe, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
   { href: "/admin", label: "Dashboard", Icon: LayoutDashboard, exact: true },
   { href: "/admin/bookings", label: "Bookings", Icon: CalendarCheck },
+  { href: "/admin/finance", label: "Finance", Icon: Wallet },
   { href: "/admin/rooms", label: "Rooms", Icon: BedDouble },
   { href: "/", label: "View website", Icon: Globe, external: true },
 ];

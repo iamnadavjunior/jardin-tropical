@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { CalendarCheck, DollarSign, Users, BedDouble, ArrowRight, TrendingUp } from "lucide-react";
+import { CalendarCheck, DollarSign, Users, BedDouble, ArrowRight, TrendingUp, Wallet } from "lucide-react";
 import { AdminShell } from "@/components/admin/admin-shell";
+import { InsightsPanel } from "@/components/admin/insights-panel";
 import { prisma } from "@/lib/prisma";
+import { buildInsights } from "@/lib/insights";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -56,13 +58,15 @@ async function getMetrics() {
 
 const statusColor: Record<string, string> = {
   BOOKED: "bg-blue-100 text-blue-700",
+  CONFIRMED: "bg-amber-100 text-amber-700",
   CHECKED_IN: "bg-emerald-100 text-emerald-700",
   CHECKED_OUT: "bg-ink/10 text-ink-muted",
   CANCELLED: "bg-red-100 text-red-700",
+  NO_SHOW: "bg-orange-100 text-orange-700",
 };
 
 export default async function AdminDashboardPage() {
-  const m = await getMetrics();
+  const [m, insights] = await Promise.all([getMetrics(), buildInsights()]);
 
   return (
     <AdminShell>
@@ -85,6 +89,11 @@ export default async function AdminDashboardPage() {
         <Stat label="Revenue" value={formatCurrency(m.revenue)} hint="All-time, non-cancelled" Icon={DollarSign} />
         <Stat label="Active guests" value={m.activeGuests.toString()} hint="Currently checked-in" Icon={Users} />
         <Stat label="Available rooms" value={`${m.available} / ${m.totalRooms}`} hint="Tonight" Icon={BedDouble} />
+      </div>
+
+      {/* Intelligent insights */}
+      <div className="mt-10">
+        <InsightsPanel insights={insights} />
       </div>
 
       {/* Recent bookings */}
@@ -143,7 +152,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Quick links */}
-      <div className="mt-10 grid gap-4 md:grid-cols-2">
+      <div className="mt-10 grid gap-4 md:grid-cols-3">
         <Link href="/admin/bookings" className="card-soft p-6 hover:shadow-md transition-shadow flex items-center justify-between group">
           <div>
             <p className="eyebrow">Manage</p>
@@ -151,6 +160,14 @@ export default async function AdminDashboardPage() {
             <p className="text-sm text-ink-muted mt-1">Filter, update status, view guest details.</p>
           </div>
           <ArrowRight size={18} className="text-ink-muted group-hover:text-ink group-hover:translate-x-1 transition-all" />
+        </Link>
+        <Link href="/admin/finance" className="card-soft p-6 hover:shadow-md transition-shadow flex items-center justify-between group">
+          <div>
+            <p className="eyebrow">Track</p>
+            <h3 className="font-serif text-xl text-ink mt-2">Finance</h3>
+            <p className="text-sm text-ink-muted mt-1">Deposits, withdrawals, balances, reports.</p>
+          </div>
+          <Wallet size={18} className="text-ink-muted group-hover:text-ink transition-all" />
         </Link>
         <Link href="/admin/rooms" className="card-soft p-6 hover:shadow-md transition-shadow flex items-center justify-between group">
           <div>

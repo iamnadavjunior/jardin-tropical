@@ -4,8 +4,8 @@ import { BookingFlow } from "@/components/booking-flow";
 import { getAllRooms } from "@/lib/rooms";
 
 export const metadata = {
-  title: "Book your stay — Apart Jardin Tropical",
-  description: "Reserve your stay at Apart Jardin Tropical in three simple steps.",
+  title: "Book your stay — Aparthotel Jardin Tropical",
+  description: "Reserve your stay at Aparthotel Jardin Tropical in three simple steps.",
 };
 
 export default async function BookingPage() {
